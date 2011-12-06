@@ -7,18 +7,20 @@ The goal of this small bash script is to simplify the process of creating a new 
 
 How to use?
 -----------
-Basically you just need to checkout the "Distributor" Package and to run the shell script::
-	git clone git@github.com:mrimann/FLOW3Distributor.git FLOW3Distributor
-	cd FLOW3Distributor
-	./FLOW3Distributor.sh
+Basically you just need to checkout the "Distributor" Package and to run the shell script
+
+::
+    git clone git@github.com:mrimann/FLOW3Distributor.git FLOW3Distributor
+    cd FLOW3Distributor
+    ./FLOW3Distributor.sh
 	
 This will create the following directory structure:
 
 ::
-	FLOW3Distributor
-		Distribution		<-- contains your new empty distribution
-		TYPO3Distributor.sh
-		README.rst
+    FLOW3Distributor
+        Distribution		<-- contains your new empty distribution
+        TYPO3Distributor.sh
+        README.rst
 
 Just move your Distribution directory to wherever you need. It's a full blown Git repository that already contains the first commit.
 
