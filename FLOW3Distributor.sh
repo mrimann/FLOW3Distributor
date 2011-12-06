@@ -6,8 +6,18 @@ if [[ -d Distribution ]]; then
 	exit 1
 fi
 
+# If we got that far, create the target directory
 mkdir Distribution
 
+
+# Check if the directory for (temporarily) cloning the FLOW3 Base Distribution exists already
+if [[ -d FLOW3_BaseDistribution ]]; then
+	echo "Ooops, the directory \"FLOW3_BaseDistribution\" seems to exist already - we can't clone into that directory then!"
+	exit 2
+fi
+
+
+echo "OK, seems we have a GO. Let's go Jolly Jumper"
 
 # init the new distribution
 cd Distribution
