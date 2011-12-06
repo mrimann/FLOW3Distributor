@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Check if the target directory exists already and exit if it does
+if [[ -d Distribution ]]; then
+	echo "Ooops, the directory \"Distribution\" seems to exist already!"
+	exit 1
+fi
+
 mkdir Distribution
 
 
