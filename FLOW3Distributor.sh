@@ -28,7 +28,8 @@ mv FLOW3_BaseDistribution/Web Distribution/
 mv FLOW3_BaseDistribution/flow3 Distribution/
 mv FLOW3_BaseDistribution/flow3.bat Distribution/
 mv FLOW3_BaseDistribution/Configuration Distribution/
-#rm -rf FLOW3_BaseDistribution
+rm -rf FLOW3_BaseDistribution
+
 
 # commit all those changes as an initial commit
 cd Distribution
