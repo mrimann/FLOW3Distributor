@@ -73,6 +73,7 @@ touch .gitignore
 cat > .gitignore <<EOF
 Data/Logs/
 Data/Persistent/EncryptionKey
+Data/Temporary/*
 Web/_Resources/*
 EOF
 
