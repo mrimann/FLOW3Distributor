@@ -68,6 +68,15 @@ mv FLOW3_BaseDistribution/Configuration Distribution/
 rm -rf FLOW3_BaseDistribution
 
 
+# ignore certain files from being versioned by Git
+touch .gitignore
+cat > .gitignore <<EOF
+Data/Logs/
+Data/Persistent/EncryptionKey
+Web/_Resources/*
+EOF
+
+
 # commit all those changes as an initial commit
 cd Distribution
 git add .
