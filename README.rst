@@ -30,4 +30,4 @@ Please yes - just send it to mario@rimann.org and let's see what I can make out 
 
 Found a bug or want an additional feature?
 ------------------------------------------
-Don't worry, just open an issue on GitHub (https://github.com/mrimann/topic-voting/issues) or even better: Fix it and contribute it back to the project. You can fork the sourcecode from the Git repository and send me a pull request as soon as you've finished (I have to find out how to work with this first, you might be the first contributor)
+Don't worry, just open an issue on GitHub (https://github.com/mrimann/FLOW3Distributor/issues) or even better: Fix it and contribute it back to the project. You can fork the sourcecode from the Git repository and send me a pull request as soon as you've finished (I have to find out how to work with this first, you might be the first contributor)
