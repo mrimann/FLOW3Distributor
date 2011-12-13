@@ -68,6 +68,29 @@ mv FLOW3_BaseDistribution/Configuration Distribution/
 rm -rf FLOW3_BaseDistribution
 
 
+cd Distribution
+# ask whether the Admin package should be integrated
+echo
+echo
+while true; do
+    read -p "Du you want the Admin Package to be integrated and activated? (y/n)" yn
+    case $yn in
+        [Yy]* ) git submodule add git://github.com/mneuhaus/FLOW3-Admin.git Packages/Application/Admin
+				./flow3 package:activate Admin
+				echo
+				echo
+				echo "Do not forget to run ./flow3 doctrine:migrate and to flush the FLOW3 caches!"
+				echo
+				break;;
+        [Nn]* ) echo "OK, no Admin Package for you - let's finish with the other stuff..."
+				echo
+				break;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+
+
+
 # ignore certain files from being versioned by Git
 touch .gitignore
 cat > .gitignore <<EOF
@@ -79,6 +102,5 @@ EOF
 
 
 # commit all those changes as an initial commit
-cd Distribution
 git add .
 git commit -a -m "Setting up the initial distribution" --author "FLOW3Distributor <mario@rimann.org>"

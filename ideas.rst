@@ -7,7 +7,7 @@ Priority "Would love to have that in"
 -------------------------------------
 - asking for the package name that should be packaged into this distribution (and it's git repo URL so it can be directly hooked in as a submodule)
 - asking for the Distribution name to build
-- asking whether the Admin-Package should be integrated and activated
+✔ asking whether the Admin-Package should be integrated and activated
 - instead of using the current folder script should as for the target directory
 
 
