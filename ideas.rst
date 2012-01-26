@@ -9,6 +9,9 @@ Priority "Would love to have that in"
 - asking for the Distribution name to build
 ✔ asking whether the Admin-Package should be integrated and activated
 - instead of using the current folder script should as for the target directory
+- remove the routes for the welcome package from the routes.yaml file
+- adding the admin routes to routes.yaml if the Admin Package is included
+
 
 
 Priority "May be"
