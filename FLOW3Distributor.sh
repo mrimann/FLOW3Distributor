@@ -100,9 +100,6 @@ cat > Configuration/Routes.yaml << EOF
       package: TYPO3.FLOW3
 EOF
 
-
-
-
 # ask whether the Admin package should be integrated
 echo
 echo
@@ -111,6 +108,49 @@ while true; do
     case $yn in
         [Yy]* ) git submodule add git://github.com/mneuhaus/FLOW3-Admin.git Packages/Application/Admin
 				./flow3 package:activate Admin
+				mv Configuration/Routes.yaml Configuration/Routes_orig.yaml
+				cat > Configuration/Routes.yaml << EOF
+##
+# Admin package subroutes
+#
+
+-
+  name: 'Authentication Actions'
+  uriPattern: 'authentication(/{@action})'
+  appendExceedingArguments: true
+  defaults:
+    '@controller': 'Login'
+    '@action': 'index'
+
+-
+  name: 'Logout'
+  uriPattern: 'logout'
+  defaults:
+    '@action': 'logout'
+    '@package': 'Admin'
+    '@controller': 'Login'
+    '@format': 'html'
+
+-
+  name: 'Admin actions'
+  uriPattern: '{@action}'
+  defaults:
+    '@action': 'index'
+    '@controller': 'Standard'
+    '@format': 'html'
+    
+-
+  name: 'Admin actions'
+  uriPattern: '{@action}/{being}'
+  appendExceedingArguments: true
+  defaults:
+    '@action': 'index'
+    '@controller': 'Standard'
+    '@format': 'html'
+
+EOF
+				cat Configuration/Routes_orig.yaml >> Configuration/Routes.yaml
+				rm -f Configuration/Routes_orig.yaml
 				echo
 				echo
 				echo "Do not forget to run ./flow3 doctrine:migrate and to flush the FLOW3 caches!"
