@@ -8,7 +8,7 @@ Priority "Would love to have that in"
 ✔ asking for the package name that should be packaged into this distribution (and it's git repo URL so it can be directly hooked in as a submodule)
 ✔ asking for the Distribution name to build
 ✔ asking whether the Admin-Package should be integrated and activated
-- remove the routes for the welcome package from the routes.yaml file
+✔ remove the routes for the welcome package from the routes.yaml file
 - adding the admin routes to routes.yaml if the Admin Package is included
 
 

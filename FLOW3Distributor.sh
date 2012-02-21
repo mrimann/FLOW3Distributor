@@ -78,8 +78,31 @@ mv FLOW3_BaseDistribution/Configuration ${targetName}/
 rm -rf FLOW3_BaseDistribution
 
 
-
+# let's move on to the new distribution's directory and pimp it a bit
+echo "Now going to pimp the new distribution a bit..."
 cd ${targetName}
+
+
+# create our own Routes.yaml file
+echo "Now creating a custom Routes.yaml file"
+cat > Configuration/Routes.yaml << EOF
+##
+# FLOW3 subroutes
+#
+
+-
+  name: 'FLOW3'
+  uriPattern: '<FLOW3Subroutes>'
+  defaults:
+    '@format': 'html'
+  subRoutes:
+    FLOW3Subroutes:
+      package: TYPO3.FLOW3
+EOF
+
+
+
+
 # ask whether the Admin package should be integrated
 echo
 echo
