@@ -104,9 +104,9 @@ EOF
 echo
 echo
 while true; do
-    read -p "Du you want the Admin Package to be integrated and activated? (y/n)" yn
-    case $yn in
-        [Yy]* ) git submodule add git://github.com/mneuhaus/FLOW3-Admin.git Packages/Application/Admin
+	read -p "Du you want the Admin Package to be integrated and activated? (y/n)" yn
+	case $yn in
+		[Yy]* ) git submodule add git://github.com/mneuhaus/FLOW3-Admin.git Packages/Application/Admin
 				./flow3 package:activate Admin
 				mv Configuration/Routes.yaml Configuration/Routes_orig.yaml
 				cat > Configuration/Routes.yaml << EOF
@@ -156,11 +156,11 @@ EOF
 				echo "Do not forget to run ./flow3 doctrine:migrate and to flush the FLOW3 caches!"
 				echo
 				break;;
-        [Nn]* ) echo "OK, no Admin Package for you - let's finish with the other stuff..."
+		[Nn]* ) echo "OK, no Admin Package for you - let's finish with the other stuff..."
 				echo
 				break;;
-        * ) echo "Please answer yes or no.";;
-    esac
+		* ) echo "Please answer yes or no.";;
+	esac
 done
 
 
@@ -172,7 +172,7 @@ echo "Note: The package to be included needs to be available as a Git repo that 
 while true; do
 	read -p "Do you want to package an other package into this distribution? (y/n)" yn
 	case $yn in
-        [Yy]* ) read -p "Please enter the package Name including the VendorPrefix (e.g. \"Acme.Example\"): " packageName
+		[Yy]* ) read -p "Please enter the package Name including the VendorPrefix (e.g. \"Acme.Example\"): " packageName
 				read -p "Please enter the URL to the Git repository of this package: " packageRepoUrl
 				git submodule add ${packageRepoUrl} Packages/Application/${packageName}
 				./flow3 package:activate ${packageName}
@@ -181,11 +181,11 @@ while true; do
 				echo "Do not forget to run ./flow3 doctrine:migrate and to flush the FLOW3 caches!"
 				echo
 				break;;
-        [Nn]* ) echo "OK, no additional Package for you - let's finish with the other stuff..."
+		[Nn]* ) echo "OK, no additional Package for you - let's finish with the other stuff..."
 				echo
 				break;;
-        * ) echo "Please answer yes or no.";;
-    esac
+		* ) echo "Please answer yes or no.";;
+	esac
 done
 
 
