@@ -21,27 +21,37 @@
 #
 
 
-# Check if the target directory exists already and exit if it does
-if [[ -d Distribution ]]; then
-	echo "Ooops, the directory \"Distribution\" seems to exist already!"
+# ask for the name of the distribution to create (target folder name)
+echo "How will your distribution be named (this will be the name of the directory containing the new Distribution):"
+read targetName
+
+if [ -z ${targetName} ]; then
+	echo "Oops, you did not specify a directory name, we won't get happy that way... Please try again."
 	exit 1
 fi
 
+# Check if the target directory exists already and exit if it does
+if [[ -d ${targetName} ]]; then
+	echo "Ooops, the directory \"${targetName}\" seems to exist already!"
+	exit 2
+fi
+
 # If we got that far, create the target directory
-mkdir Distribution
+mkdir ${targetName}
 
 
 # Check if the directory for (temporarily) cloning the FLOW3 Base Distribution exists already
 if [[ -d FLOW3_BaseDistribution ]]; then
 	echo "Ooops, the directory \"FLOW3_BaseDistribution\" seems to exist already - we can't clone into that directory then!"
-	exit 2
+	exit 3
 fi
 
 
 echo "OK, seems we have a GO. Let's go Jolly Jumper"
 
+
 # init the new distribution
-cd Distribution
+cd ${targetName}
 git init
 
 
@@ -61,14 +71,15 @@ git submodule add git://git.typo3.org/FLOW3/BuildEssentials.git Build/Common
 cd ../
 git clone git://git.typo3.org/FLOW3/Distributions/Base.git FLOW3_BaseDistribution
 
-mv FLOW3_BaseDistribution/Web Distribution/
-mv FLOW3_BaseDistribution/flow3 Distribution/
-mv FLOW3_BaseDistribution/flow3.bat Distribution/
-mv FLOW3_BaseDistribution/Configuration Distribution/
+mv FLOW3_BaseDistribution/Web ${targetName}/
+mv FLOW3_BaseDistribution/flow3 ${targetName}/
+mv FLOW3_BaseDistribution/flow3.bat ${targetName}/
+mv FLOW3_BaseDistribution/Configuration ${targetName}/
 rm -rf FLOW3_BaseDistribution
 
 
-cd Distribution
+
+cd ${targetName}
 # ask whether the Admin package should be integrated
 echo
 echo
