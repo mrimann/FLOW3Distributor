@@ -101,6 +101,34 @@ while true; do
 done
 
 
+# ask whether an own package shall be included
+echo
+echo
+echo "Now we're almost done, but we could add a package if you'd like...?"
+echo "Note: The package to be included needs to be available as a Git repo that we can add as a submodule."
+while true; do
+	read -p "Do you want to package an other package into this distribution? (y/n)" yn
+	case $yn in
+        [Yy]* ) read -p "Please enter the package Name including the VendorPrefix (e.g. \"Acme.Example\"): " packageName
+				read -p "Please enter the URL to the Git repository of this package: " packageRepoUrl
+				git submodule add ${packageRepoUrl} Packages/Application/${packageName}
+				./flow3 package:activate ${packageName}
+				echo
+				echo
+				echo "Do not forget to run ./flow3 doctrine:migrate and to flush the FLOW3 caches!"
+				echo
+				break;;
+        [Nn]* ) echo "OK, no additional Package for you - let's finish with the other stuff..."
+				echo
+				break;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+
+
+
+
+
 
 # ignore certain files from being versioned by Git
 touch .gitignore
