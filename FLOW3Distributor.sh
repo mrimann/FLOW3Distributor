@@ -104,7 +104,7 @@ EOF
 echo
 echo
 while true; do
-	read -p "Du you want the Admin Package to be integrated and activated? (y/n)" yn
+	read -p "Do you want the Admin Package to be integrated and activated? (y/n)" yn
 	case $yn in
 		[Yy]* ) git submodule add git://github.com/mneuhaus/FLOW3-Admin.git Packages/Application/Admin
 				./flow3 package:activate Admin
