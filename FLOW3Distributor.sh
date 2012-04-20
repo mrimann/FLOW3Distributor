@@ -163,24 +163,46 @@ EOF
 	esac
 done
 
+function promptForPkgName {
+	read -p "Please enter the package Name including the VendorPrefix (e.g. \"Acme.Example\"): " packageName
+}
 
-# ask whether an own package shall be included
+function includePackage {
+	git submodule add ${packageRepoUrl} Packages/Application/${packageName}
+	./flow3 package:activate ${packageName}
+	echo
+	echo
+	echo "Do not forget to run ./flow3 doctrine:migrate and to flush the FLOW3 caches!"
+	echo
+}
+
+# ask about including another package in the distribution
 echo
 echo
 echo "Now we're almost done, but we could add a package if you'd like...?"
 echo "Note: The package to be included needs to be available as a Git repo that we can add as a submodule."
 while true; do
-	read -p "Do you want to package an other package into this distribution? (y/n)" yn
+		#Note: we can't use ./flow3 package:import because we want to include the package
+		#in the distribution, and package:import doesn't add it as a git submodule.
+	read -p "Do you want to include another package from git.typo3.org in this distribution? (y/n)" yn
 	case $yn in
-		[Yy]* ) read -p "Please enter the package Name including the VendorPrefix (e.g. \"Acme.Example\"): " packageName
-				read -p "Please enter the URL to the Git repository of this package: " packageRepoUrl
-				git submodule add ${packageRepoUrl} Packages/Application/${packageName}
-				./flow3 package:activate ${packageName}
-				echo
-				echo
-				echo "Do not forget to run ./flow3 doctrine:migrate and to flush the FLOW3 caches!"
+		[Yy]* ) promptForPkgName
+				packageRepoUrl="git://git.typo3.org/FLOW3/Packages/${packageName}"
+				includePackage
+				;;
+		[Nn]* ) echo "OK, no more TYPO3 packages. Perhaps there are packages in a different git repository that you want..."
 				echo
 				break;;
+		* ) echo "Please answer yes or no.";;
+	esac
+done
+while true; do
+	read -p "Do you want to include another package in this distribution? (y/n)" yn
+	case $yn in
+		[Yy]* ) promptForPkgName
+				read -p "Please enter the URL to the Git repository of this package: " packageRepoUrl
+				includePackage
+				;;
 		[Nn]* ) echo "OK, no additional Package for you - let's finish with the other stuff..."
 				echo
 				break;;
