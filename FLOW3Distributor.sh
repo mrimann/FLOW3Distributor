@@ -22,7 +22,7 @@
 
 
 # ask for the name of the distribution to create (target folder name)
-echo "How will your distribution be named (this will be the name of the directory containing the new Distribution):"
+echo "What should your distribution be named (this will be the name of the directory containing the new Distribution):"
 read targetName
 
 if [ -z ${targetName} ]; then
@@ -46,8 +46,69 @@ if [[ -d FLOW3_BaseDistribution ]]; then
 	exit 3
 fi
 
+function pkg_push {
+	pkg_arr=("${pkg_arr[@]}" "$1")
+}
+function pkg_url_push {
+	pkg_url_arr=("${pkg_url_arr[@]}" "$1")
+}
+function promptForPkgName {
+	read -p "Please enter the package Name including the VendorPrefix (e.g. \"Acme.Example\"): " packageName
+	pkg_push $packageName
+}
 
+echo "Besides the basic FLOW3 packages, you might want to include other packages in this distribution."
+echo
+#admin package prompt
+while true; do
+	read -p "Do you want the Admin Package to be integrated and activated? (y/n) " yn
+	case $yn in
+		[Yy]* ) pkg_admin=true
+				break;;
+		[Nn]* ) echo "OK, no Admin Package for you."
+				pkg_admin=false
+				echo
+				break;;
+		* ) echo "Please answer yes or no.";;
+	esac
+done
+echo
+echo
+echo "We can add other package if you'd like."
+echo "Note: Each included package needs to be available as a Git repo that we can add it as a submodule."
+while true; do
+	#Note: we can't use ./flow3 package:import because we want to include the package
+	#in the distribution, and package:import doesn't add it as a git submodule.
+	echo
+	read -p "Do you want to include another package from git.typo3.org in this distribution? (y/n) " yn
+	case $yn in
+		[Yy]* ) promptForPkgName
+				pkg_url_push "git://git.typo3.org/FLOW3/Packages/${packageName}"
+				;;
+		[Nn]* ) echo "OK, no more TYPO3 packages. Perhaps there are packages in a different git repository that you want..."
+				echo
+				break;;
+		* ) echo "Please answer yes or no.";;
+	esac
+done
+while true; do
+	echo
+	read -p "Do you want to include another package in this distribution? (y/n) " yn
+	case $yn in
+		[Yy]* ) promptForPkgName
+				read -p "Please enter the URL to the Git repository of this package: " packageRepoUrl
+				pkg_url_push packageRepoUrl
+				;;
+		[Nn]* ) echo "OK, no more packages for you - let's finish with the other stuff..."
+				echo
+				break;;
+		* ) echo "Please answer yes or no.";;
+	esac
+done
+
+echo
 echo "OK, seems we have a GO. Let's go Jolly Jumper"
+echo
 
 
 # init the new distribution
@@ -79,7 +140,6 @@ rm -rf FLOW3_BaseDistribution
 
 
 # let's move on to the new distribution's directory and pimp it a bit
-echo "Now going to pimp the new distribution a bit..."
 cd ${targetName}
 
 
@@ -101,15 +161,12 @@ cat > Configuration/Routes.yaml << EOF
 EOF
 
 # ask whether the Admin package should be integrated
-echo
-echo
-while true; do
-	read -p "Do you want the Admin Package to be integrated and activated? (y/n)" yn
-	case $yn in
-		[Yy]* ) git submodule add git://github.com/mneuhaus/FLOW3-Admin.git Packages/Application/Admin
-				./flow3 package:activate Admin
-				mv Configuration/Routes.yaml Configuration/Routes_orig.yaml
-				cat > Configuration/Routes.yaml << EOF
+
+if $pkg_admin; then
+	git submodule add git://github.com/mneuhaus/FLOW3-Admin.git Packages/Application/Admin
+	./flow3 package:activate Admin
+	mv Configuration/Routes.yaml Configuration/Routes_orig.yaml
+	cat > Configuration/Routes.yaml << EOF
 ##
 # Admin package subroutes
 #
@@ -149,71 +206,25 @@ while true; do
     '@format': 'html'
 
 EOF
-				cat Configuration/Routes_orig.yaml >> Configuration/Routes.yaml
-				rm -f Configuration/Routes_orig.yaml
-				echo
-				echo
-				echo "Do not forget to run ./flow3 doctrine:migrate and to flush the FLOW3 caches!"
-				echo
-				break;;
-		[Nn]* ) echo "OK, no Admin Package for you - let's finish with the other stuff..."
-				echo
-				break;;
-		* ) echo "Please answer yes or no.";;
-	esac
+	cat Configuration/Routes_orig.yaml >> Configuration/Routes.yaml
+	rm -f Configuration/Routes_orig.yaml
+else
+	echo "Skipping the Admin Package - let's finish with the other stuff..."
+fi
+
+
+#include each package
+pkg_count=${#pkg_arr[@]}
+for (( i=0; i<${pkg_count}; i++ )); do
+	git submodule add ${pkg_arr[$i]} Packages/Application/${pkg_url_arr[$i]}
+	./flow3 package:activate ${pkg_arr[$i]} 
 done
-
-function promptForPkgName {
-	read -p "Please enter the package Name including the VendorPrefix (e.g. \"Acme.Example\"): " packageName
-}
-
-function includePackage {
-	git submodule add ${packageRepoUrl} Packages/Application/${packageName}
-	./flow3 package:activate ${packageName}
+if $pkg_admin || [ $pkg_count > 0 ]; then
 	echo
 	echo
 	echo "Do not forget to run ./flow3 doctrine:migrate and to flush the FLOW3 caches!"
 	echo
-}
-
-# ask about including another package in the distribution
-echo
-echo
-echo "Now we're almost done, but we could add a package if you'd like...?"
-echo "Note: The package to be included needs to be available as a Git repo that we can add as a submodule."
-while true; do
-		#Note: we can't use ./flow3 package:import because we want to include the package
-		#in the distribution, and package:import doesn't add it as a git submodule.
-	read -p "Do you want to include another package from git.typo3.org in this distribution? (y/n)" yn
-	case $yn in
-		[Yy]* ) promptForPkgName
-				packageRepoUrl="git://git.typo3.org/FLOW3/Packages/${packageName}"
-				includePackage
-				;;
-		[Nn]* ) echo "OK, no more TYPO3 packages. Perhaps there are packages in a different git repository that you want..."
-				echo
-				break;;
-		* ) echo "Please answer yes or no.";;
-	esac
-done
-while true; do
-	read -p "Do you want to include another package in this distribution? (y/n)" yn
-	case $yn in
-		[Yy]* ) promptForPkgName
-				read -p "Please enter the URL to the Git repository of this package: " packageRepoUrl
-				includePackage
-				;;
-		[Nn]* ) echo "OK, no additional Package for you - let's finish with the other stuff..."
-				echo
-				break;;
-		* ) echo "Please answer yes or no.";;
-	esac
-done
-
-
-
-
-
+fi
 
 # ignore certain files from being versioned by Git
 touch .gitignore
