@@ -97,7 +97,7 @@ while true; do
 	case $yn in
 		[Yy]* ) promptForPkgName
 				read -p "Please enter the URL to the Git repository of this package: " packageRepoUrl
-				pkg_url_push packageRepoUrl
+				pkg_url_push $packageRepoUrl
 				;;
 		[Nn]* ) echo "OK, no more packages for you - let's finish with the other stuff..."
 				echo
