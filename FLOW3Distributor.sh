@@ -254,7 +254,7 @@ git commit -a -m "Setting up the initial distribution" --author "FLOW3Distributo
 
 echo
 echo
-if $pkg_admin || [ $pkg_count > 0 ]; then
+if $pkg_admin || [[ $pkg_count > 0 ]]; then
 	echo "Do not forget to run ./flow3 doctrine:migrate and to flush the FLOW3 caches!"
 	echo
 fi
