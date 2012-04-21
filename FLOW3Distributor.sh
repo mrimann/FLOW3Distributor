@@ -22,7 +22,7 @@
 
 
 # ask for the name of the distribution to create (target folder name)
-echo "How will your distribution be named (this will be the name of the directory containing the new Distribution):"
+echo "What should your distribution be named (this will be the name of the directory containing the new Distribution):"
 read targetName
 
 if [ -z ${targetName} ]; then
@@ -41,46 +41,132 @@ mkdir ${targetName}
 
 
 # Check if the directory for (temporarily) cloning the FLOW3 Base Distribution exists already
-if [[ -d FLOW3_BaseDistribution ]]; then
-	echo "Ooops, the directory \"FLOW3_BaseDistribution\" seems to exist already - we can't clone into that directory then!"
-	exit 3
-fi
+#if [[ -d FLOW3_BaseDistribution ]]; then
+#	echo "Ooops, the directory \"FLOW3_BaseDistribution\" seems to exist already - we can't clone into that directory then!"
+#	exit 3
+#fi
 
+function pkg_push {
+	pkg_arr=("${pkg_arr[@]}" "$1")
+}
+function pkg_url_push {
+	pkg_url_arr=("${pkg_url_arr[@]}" "$1")
+}
+function promptForPkgName {
+	read -p "Please enter the package Name including the VendorPrefix (e.g. \"Acme.Example\"): " packageName
+	pkg_push $packageName
+}
 
+echo "Besides the basic FLOW3 packages, you might want to include other packages in this distribution."
+echo
+#admin package prompt
+while true; do
+	read -p "Do you want the Admin Package to be integrated and activated? (y/n) " yn
+	case $yn in
+		[Yy]* ) pkg_admin=true
+				break;;
+		[Nn]* ) echo "OK, no Admin Package for you."
+				pkg_admin=false
+				echo
+				break;;
+		* ) echo "Please answer yes or no.";;
+	esac
+done
+echo
+echo
+echo "We can add other package if you'd like."
+echo "Note: Each included package needs to be available as a Git repo that we can add it as a submodule."
+while true; do
+	#Note: we can't use ./flow3 package:import because we want to include the package
+	#in the distribution, and package:import doesn't add it as a git submodule.
+	echo
+	read -p "Do you want to include another package from git.typo3.org in this distribution? (y/n) " yn
+	case $yn in
+		[Yy]* ) promptForPkgName
+				pkg_url_push "git://git.typo3.org/FLOW3/Packages/${packageName}"
+				;;
+		[Nn]* ) echo "OK, no more TYPO3 packages. Perhaps there are packages in a different git repository that you want..."
+				echo
+				break;;
+		* ) echo "Please answer yes or no.";;
+	esac
+done
+while true; do
+	echo
+	read -p "Do you want to include another package in this distribution? (y/n) " yn
+	case $yn in
+		[Yy]* ) promptForPkgName
+				read -p "Please enter the URL to the Git repository of this package: " packageRepoUrl
+				pkg_url_push $packageRepoUrl
+				;;
+		[Nn]* ) echo "OK, no more packages for you - let's finish with the other stuff..."
+				echo
+				break;;
+		* ) echo "Please answer yes or no.";;
+	esac
+done
+
+echo
 echo "OK, seems we have a GO. Let's go Jolly Jumper"
+echo
 
 
 # init the new distribution
+git clone --recursive -o typo3 git://git.typo3.org/FLOW3/Distributions/Base.git ${targetName}
 cd ${targetName}
-git init
+#git init
 
+git config --unset branch.master.remote
+
+# Add Base.git as remote
+#git remote add typo3 git://git.typo3.org/FLOW3/Distributions/Base.git
+#git pull typo3 master
+
+# TODO Make it ask for and add a custom remote origin url:
+#git remote add <wherever this repo is supposed to go> origin
+# And then at the end of this script, push the resulting distro:
+#git push origin
+
+# TODO make it checkout a particular tag like FLOW3_1.0.4 or something.
 
 # hook in all the needed submodules
-git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.FLOW3.git Packages/Framework/TYPO3.FLOW3
-git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.Fluid.git Packages/Framework/TYPO3.Fluid
-git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.Kickstart.git Packages/Framework/TYPO3.Kickstart
-git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.Party.git Packages/Framework/TYPO3.Party
-git submodule add git://git.typo3.org/FLOW3/Packages/Doctrine.ORM.git Packages/Framework/Doctrine.ORM
-git submodule add git://git.typo3.org/FLOW3/Packages/Doctrine.Common.git Packages/Framework/Doctrine.Common
-git submodule add git://git.typo3.org/FLOW3/Packages/Doctrine.DBAL.git Packages/Framework/Doctrine.DBAL
-git submodule add git://git.typo3.org/FLOW3/Packages/Symfony.Component.Yaml.git Packages/Framework/Symfony.Component.Yaml
-git submodule add git://git.typo3.org/FLOW3/BuildEssentials.git Build/Common
+#git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.FLOW3.git Packages/Framework/TYPO3.FLOW3
+#git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.Fluid.git Packages/Framework/TYPO3.Fluid
+#git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.Kickstart.git Packages/Framework/TYPO3.Kickstart
+#git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.Party.git Packages/Framework/TYPO3.Party
+#git submodule add git://git.typo3.org/FLOW3/Packages/Doctrine.ORM.git Packages/Framework/Doctrine.ORM
+#git submodule add git://git.typo3.org/FLOW3/Packages/Doctrine.Common.git Packages/Framework/Doctrine.Common
+#git submodule add git://git.typo3.org/FLOW3/Packages/Doctrine.DBAL.git Packages/Framework/Doctrine.DBAL
+#git submodule add git://git.typo3.org/FLOW3/Packages/Symfony.Component.Yaml.git Packages/Framework/Symfony.Component.Yaml
+#git submodule add git://git.typo3.org/FLOW3/BuildEssentials.git Build/Common
 
 
 # add the needed base files from the FLOW3 base distribution
-cd ../
-git clone git://git.typo3.org/FLOW3/Distributions/Base.git FLOW3_BaseDistribution
+#cd ../
+#git clone git://git.typo3.org/FLOW3/Distributions/Base.git FLOW3_BaseDistribution
 
-mv FLOW3_BaseDistribution/Web ${targetName}/
-mv FLOW3_BaseDistribution/flow3 ${targetName}/
-mv FLOW3_BaseDistribution/flow3.bat ${targetName}/
-mv FLOW3_BaseDistribution/Configuration ${targetName}/
-rm -rf FLOW3_BaseDistribution
+#mv FLOW3_BaseDistribution/Web ${targetName}/
+#mv FLOW3_BaseDistribution/flow3 ${targetName}/
+#mv FLOW3_BaseDistribution/flow3.bat ${targetName}/
+#mv FLOW3_BaseDistribution/Configuration ${targetName}/
+#rm -rf FLOW3_BaseDistribution
 
 
 # let's move on to the new distribution's directory and pimp it a bit
-echo "Now going to pimp the new distribution a bit..."
-cd ${targetName}
+#cd ${targetName}
+
+# ignore certain files from being versioned by Git
+touch .gitignore
+cat > .gitignore <<EOF
+Build/Archives/
+Build/Reports/
+Build/Temporary/
+Data/Logs/
+Data/Persistent/EncryptionKey
+Data/Temporary/*
+Packages/.Shortcuts/
+Web/_Resources/*
+EOF
 
 
 # create our own Routes.yaml file
@@ -101,15 +187,12 @@ cat > Configuration/Routes.yaml << EOF
 EOF
 
 # ask whether the Admin package should be integrated
-echo
-echo
-while true; do
-	read -p "Do you want the Admin Package to be integrated and activated? (y/n)" yn
-	case $yn in
-		[Yy]* ) git submodule add git://github.com/mneuhaus/FLOW3-Admin.git Packages/Application/Admin
-				./flow3 package:activate Admin
-				mv Configuration/Routes.yaml Configuration/Routes_orig.yaml
-				cat > Configuration/Routes.yaml << EOF
+
+if $pkg_admin; then
+	git submodule add git://github.com/mneuhaus/FLOW3-Admin.git Packages/Application/Admin
+	./flow3 package:activate Admin
+	mv Configuration/Routes.yaml Configuration/Routes_orig.yaml
+	cat > Configuration/Routes.yaml << EOF
 ##
 # Admin package subroutes
 #
@@ -149,60 +232,33 @@ while true; do
     '@format': 'html'
 
 EOF
-				cat Configuration/Routes_orig.yaml >> Configuration/Routes.yaml
-				rm -f Configuration/Routes_orig.yaml
-				echo
-				echo
-				echo "Do not forget to run ./flow3 doctrine:migrate and to flush the FLOW3 caches!"
-				echo
-				break;;
-		[Nn]* ) echo "OK, no Admin Package for you - let's finish with the other stuff..."
-				echo
-				break;;
-		* ) echo "Please answer yes or no.";;
-	esac
+	cat Configuration/Routes_orig.yaml >> Configuration/Routes.yaml
+	rm -f Configuration/Routes_orig.yaml
+else
+	echo "Skipping the Admin Package - let's finish with the other stuff..."
+fi
+
+
+#include each package
+pkg_count=${#pkg_arr[@]}
+for (( i=0; i<${pkg_count}; i++ )); do
+	git submodule add ${pkg_url_arr[$i]} Packages/Application/${pkg_arr[$i]}
+	./flow3 package:activate ${pkg_arr[$i]} 
 done
 
-
-# ask whether an own package shall be included
-echo
-echo
-echo "Now we're almost done, but we could add a package if you'd like...?"
-echo "Note: The package to be included needs to be available as a Git repo that we can add as a submodule."
-while true; do
-	read -p "Do you want to package an other package into this distribution? (y/n)" yn
-	case $yn in
-		[Yy]* ) read -p "Please enter the package Name including the VendorPrefix (e.g. \"Acme.Example\"): " packageName
-				read -p "Please enter the URL to the Git repository of this package: " packageRepoUrl
-				git submodule add ${packageRepoUrl} Packages/Application/${packageName}
-				./flow3 package:activate ${packageName}
-				echo
-				echo
-				echo "Do not forget to run ./flow3 doctrine:migrate and to flush the FLOW3 caches!"
-				echo
-				break;;
-		[Nn]* ) echo "OK, no additional Package for you - let's finish with the other stuff..."
-				echo
-				break;;
-		* ) echo "Please answer yes or no.";;
-	esac
-done
-
-
-
-
-
-
-# ignore certain files from being versioned by Git
-touch .gitignore
-cat > .gitignore <<EOF
-Data/Logs/
-Data/Persistent/EncryptionKey
-Data/Temporary/*
-Web/_Resources/*
-EOF
 
 
 # commit all those changes as an initial commit
 git add .
 git commit -a -m "Setting up the initial distribution" --author "FLOW3Distributor <mario@rimann.org>"
+
+echo
+echo
+if $pkg_admin || [[ $pkg_count > 0 ]]; then
+	echo "Do not forget to run ./flow3 doctrine:migrate and to flush the FLOW3 caches!"
+	echo
+fi
+echo "If you'll be hosting this distro on github (or similar) be sure to add an origin and push to it:"
+echo "   git remote add origin <url where this repo is supposed to go>"
+echo "   git config branch.master.remote origin"
+echo "   git push -u origin master"
