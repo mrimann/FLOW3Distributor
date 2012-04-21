@@ -43,10 +43,10 @@ mkdir ${targetName}
 
 
 # Check if the directory for (temporarily) cloning the FLOW3 Base Distribution exists already
-if [[ -d FLOW3_BaseDistribution ]]; then
-	echo "Ooops, the directory \"FLOW3_BaseDistribution\" seems to exist already - we can't clone into that directory then!"
-	exit 3
-fi
+#if [[ -d FLOW3_BaseDistribution ]]; then
+#	echo "Ooops, the directory \"FLOW3_BaseDistribution\" seems to exist already - we can't clone into that directory then!"
+#	exit 3
+#fi
 
 # Adds package to the package stack of packages that need to be included. Once included, they'll be 'pop'ed off.
 function pkg_push {
@@ -136,35 +136,61 @@ echo
 
 
 # init the new distribution
+git clone --recursive -o typo3 git://git.typo3.org/FLOW3/Distributions/Base.git ${targetName}
 cd ${targetName}
-git init
+#git init
 
+git config --unset branch.master.remote
+
+# Add Base.git as remote
+#git remote add typo3 git://git.typo3.org/FLOW3/Distributions/Base.git
+#git pull typo3 master
+
+# TODO Make it ask for and add a custom remote origin url:
+#git remote add <wherever this repo is supposed to go> origin
+# And then at the end of this script, push the resulting distro:
+#git push origin
+
+# TODO make it checkout a particular tag like FLOW3_1.0.4 or something.
 
 # hook in all the needed submodules
-git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.FLOW3.git Packages/Framework/TYPO3.FLOW3
-git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.Fluid.git Packages/Framework/TYPO3.Fluid
-git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.Kickstart.git Packages/Framework/TYPO3.Kickstart
-git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.Party.git Packages/Framework/TYPO3.Party
-git submodule add git://git.typo3.org/FLOW3/Packages/Doctrine.ORM.git Packages/Framework/Doctrine.ORM
-git submodule add git://git.typo3.org/FLOW3/Packages/Doctrine.Common.git Packages/Framework/Doctrine.Common
-git submodule add git://git.typo3.org/FLOW3/Packages/Doctrine.DBAL.git Packages/Framework/Doctrine.DBAL
-git submodule add git://git.typo3.org/FLOW3/Packages/Symfony.Component.Yaml.git Packages/Framework/Symfony.Component.Yaml
-git submodule add git://git.typo3.org/FLOW3/BuildEssentials.git Build/Common
+#git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.FLOW3.git Packages/Framework/TYPO3.FLOW3
+#git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.Fluid.git Packages/Framework/TYPO3.Fluid
+#git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.Kickstart.git Packages/Framework/TYPO3.Kickstart
+#git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.Party.git Packages/Framework/TYPO3.Party
+#git submodule add git://git.typo3.org/FLOW3/Packages/Doctrine.ORM.git Packages/Framework/Doctrine.ORM
+#git submodule add git://git.typo3.org/FLOW3/Packages/Doctrine.Common.git Packages/Framework/Doctrine.Common
+#git submodule add git://git.typo3.org/FLOW3/Packages/Doctrine.DBAL.git Packages/Framework/Doctrine.DBAL
+#git submodule add git://git.typo3.org/FLOW3/Packages/Symfony.Component.Yaml.git Packages/Framework/Symfony.Component.Yaml
+#git submodule add git://git.typo3.org/FLOW3/BuildEssentials.git Build/Common
 
 
 # add the needed base files from the FLOW3 base distribution
-cd ../
-git clone git://git.typo3.org/FLOW3/Distributions/Base.git FLOW3_BaseDistribution
+#cd ../
+#git clone git://git.typo3.org/FLOW3/Distributions/Base.git FLOW3_BaseDistribution
 
-mv FLOW3_BaseDistribution/Web ${targetName}/
-mv FLOW3_BaseDistribution/flow3 ${targetName}/
-mv FLOW3_BaseDistribution/flow3.bat ${targetName}/
-mv FLOW3_BaseDistribution/Configuration ${targetName}/
-rm -rf FLOW3_BaseDistribution
+#mv FLOW3_BaseDistribution/Web ${targetName}/
+#mv FLOW3_BaseDistribution/flow3 ${targetName}/
+#mv FLOW3_BaseDistribution/flow3.bat ${targetName}/
+#mv FLOW3_BaseDistribution/Configuration ${targetName}/
+#rm -rf FLOW3_BaseDistribution
 
 
 # let's move on to the new distribution's directory and pimp it a bit
-cd ${targetName}
+#cd ${targetName}
+
+# ignore certain files from being versioned by Git
+touch .gitignore
+cat > .gitignore <<EOF
+Build/Archives/
+Build/Reports/
+Build/Temporary/
+Data/Logs/
+Data/Persistent/EncryptionKey
+Data/Temporary/*
+Packages/.Shortcuts/
+Web/_Resources/*
+EOF
 
 
 # create our own Routes.yaml file
@@ -243,23 +269,20 @@ for (( i=0; i<${pkg_count}; i++ )); do
 	git submodule add ${pkg_url_arr[$i]} Packages/Application/${pkg_arr[$i]}
 	./flow3 package:activate ${pkg_arr[$i]} 
 done
-if $pkg_admin || [[ $pkg_count > 0 ]]; then
-	echo
-	echo
-	echo "Do not forget to run ./flow3 doctrine:migrate and to flush the FLOW3 caches!"
-	echo
-fi
 
-# ignore certain files from being versioned by Git
-touch .gitignore
-cat > .gitignore <<EOF
-Data/Logs/
-Data/Persistent/EncryptionKey
-Data/Temporary/*
-Web/_Resources/*
-EOF
 
 
 # commit all those changes as an initial commit
 git add .
 git commit -a -m "Setting up the initial distribution" --author "FLOW3Distributor <mario@rimann.org>"
+
+echo
+echo
+if $pkg_admin || [[ $pkg_count > 0 ]]; then
+	echo "Do not forget to run ./flow3 doctrine:migrate and to flush the FLOW3 caches!"
+	echo
+fi
+echo "If you'll be hosting this distro on github (or similar) be sure to add an origin and push to it:"
+echo "   git remote add origin <url where this repo is supposed to go>"
+echo "   git config branch.master.remote origin"
+echo "   git push -u origin master"
