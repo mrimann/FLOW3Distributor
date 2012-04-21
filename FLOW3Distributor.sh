@@ -259,5 +259,6 @@ if $pkg_admin || [ $pkg_count > 0 ]; then
 	echo
 fi
 echo "If you'll be hosting this distro on github (or similar) be sure to add an origin and push to it:"
-echo "   git remote add <url where this repo is supposed to go> origin"
-echo "   git push origin"
+echo "   git remote add origin <url where this repo is supposed to go>"
+echo "   git config branch.master.remote origin"
+echo "   git push -u origin master"
