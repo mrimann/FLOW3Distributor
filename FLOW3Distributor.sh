@@ -138,7 +138,7 @@ while true; do
     '@action': 'index'
     '@controller': 'Standard'
     '@format': 'html'
-    
+
 -
   name: 'Admin actions'
   uriPattern: '{@action}/{being}'
@@ -163,10 +163,14 @@ EOF
 	esac
 done
 
+
+# Asks for Package Name
 function promptForPkgName {
 	read -p "Please enter the package Name including the VendorPrefix (e.g. \"Acme.Example\"): " packageName
 }
 
+
+# Includes a Package as a submodule of the Distribution and activates it
 function includePackage {
 	git submodule add ${packageRepoUrl} Packages/Application/${packageName}
 	./flow3 package:activate ${packageName}
@@ -176,28 +180,37 @@ function includePackage {
 	echo
 }
 
+
 # ask about including another package in the distribution
 echo
 echo
-echo "Now we're almost done, but we could add a package if you'd like...?"
-echo "Note: The package to be included needs to be available as a Git repo that we can add as a submodule."
+echo "Now we're almost done, but we could add existing packages if you'd like...?"
+echo "Note: The packages to be included need to be available in a Git repo that we can add as a submodule."
+echo "For packages that are available on git.typo3.org, you'd only need the Package name - but you can"
+echo "also add every other Git repository that contains a valid FLOW3 Package."
+echo
+echo
+
+# ask about packages from git.typo3.org
 while true; do
-		#Note: we can't use ./flow3 package:import because we want to include the package
-		#in the distribution, and package:import doesn't add it as a git submodule.
-	read -p "Do you want to include another package from git.typo3.org in this distribution? (y/n)" yn
+	# Note: we can't use ./flow3 package:import because we want to include the package
+	# in the distribution, and package:import doesn't add it as a git submodule.
+	read -p "Do you want to include a package from git.typo3.org in this distribution? (y/n)" yn
 	case $yn in
 		[Yy]* ) promptForPkgName
 				packageRepoUrl="git://git.typo3.org/FLOW3/Packages/${packageName}"
 				includePackage
 				;;
-		[Nn]* ) echo "OK, no more TYPO3 packages. Perhaps there are packages in a different git repository that you want..."
+		[Nn]* ) echo "OK, no more TYPO3 packages. Perhaps there are packages in a different git repository that you want to include...?"
 				echo
 				break;;
 		* ) echo "Please answer yes or no.";;
 	esac
 done
+
+# ask for any other package to include
 while true; do
-	read -p "Do you want to include another package in this distribution? (y/n)" yn
+	read -p "Do you want to include any other package in this distribution? (y/n)" yn
 	case $yn in
 		[Yy]* ) promptForPkgName
 				read -p "Please enter the URL to the Git repository of this package: " packageRepoUrl
