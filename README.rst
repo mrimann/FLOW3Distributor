@@ -12,15 +12,17 @@ Basically you just need to checkout the "Distributor" Package and to run the she
     git clone git@github.com:mrimann/FLOW3Distributor.git FLOW3Distributor
     cd FLOW3Distributor
     ./FLOW3Distributor.sh
-	
+
 This will create the following directory structure::
 
     FLOW3Distributor
-        Distribution		<-- contains your new empty distribution
+        Distribution		<-- contains your new empty distribution (with your chosen name)
         TYPO3Distributor.sh
         README.rst
 
-Just move your Distribution directory to wherever you need. It's a full blown Git repository that already contains the first commit.
+During the run of the script, the basically needed submodules like FLOW3 itself are being added as Git submodules automagically. Your're getting asked about adding further FLOW3-Packages either directly from git.typo3.org - or from any other Git repository.
+
+Just move your Distribution directory to wherever you need. It's a full blown Git repository that already contains the first commit and all the needed submodules.
 
 
 Feedback?
