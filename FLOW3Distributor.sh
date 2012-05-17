@@ -22,6 +22,8 @@
 
 
 # ask for the name of the distribution to create (target folder name)
+echo
+echo
 echo "What should your distribution be named (this will be the name of the directory containing the new Distribution):"
 read targetName
 
@@ -62,6 +64,7 @@ function promptForPkgName {
 	pkg_push $packageName
 }
 
+echo
 echo "Besides the basic FLOW3 packages, you might want to include other packages in this distribution."
 echo
 #admin package prompt
