@@ -42,11 +42,40 @@ fi
 mkdir ${targetName}
 
 
+# let's check whether we shall clone recursive or if we shall use the "old" mechanism of really creating
+# our own distribution by adding the submodules "by hand"
+echo
+echo "Your distribution can either be independent or linked to the original Base Distribution from"
+echo "git.typo3.org - that's up to you and whether you'll really need this additional feature that"
+echo "Git offers."
+echo
+echo "yes = your Distribution will get an additional remote called \"typo3\" from which you can then"
+echo "      pull updates in the Base-Distribution of FLOW3 but you can also push/pull from your own"
+echo "      repository which is the remote called \"origin\"."
+echo "no  = your Distribution won't be linked to the original Base Distribution from git.typo3.org"
+echo "      and you'll have just one Git remote called \"origin\" to push/pull to/from."
+echo
+while true; do
+	read -p "Do you want to use Base.git from typo3.org as a typo3 origin? (if you don't know, just say no) (y/n) " yn
+	case $yn in
+		[Yy]* ) doRecursiveClone=true
+				break;;
+		[Nn]* ) doRecursiveClone=false
+				break;;
+		* ) echo "Please answer yes or no.";;
+	esac
+done
+echo
+echo
+
+
 # Check if the directory for (temporarily) cloning the FLOW3 Base Distribution exists already
-#if [[ -d FLOW3_BaseDistribution ]]; then
-#	echo "Ooops, the directory \"FLOW3_BaseDistribution\" seems to exist already - we can't clone into that directory then!"
-#	exit 3
-#fi
+if ! $doRecursiveClone; then
+	if [[ -d FLOW3_BaseDistribution ]]; then
+		echo "Ooops, the directory \"FLOW3_BaseDistribution\" seems to exist already - we can't clone into that directory then!"
+		exit 3
+	fi
+fi
 
 # Adds package to the package stack of packages that need to be included. Once included, they'll be 'pop'ed off.
 function pkg_push {
