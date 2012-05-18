@@ -244,7 +244,7 @@ if $pkg_admin; then
 	git submodule add git://github.com/mneuhaus/FLOW3-Admin.git Packages/Application/Admin
 	./flow3 package:activate Admin
 	mv Configuration/Routes.yaml Configuration/Routes_orig.yaml
-	cat > Configuration/Routes.yaml <<EOF
+	cat > Configuration/Routes.yaml << EOF
 ##
 # Admin package subroutes
 #
