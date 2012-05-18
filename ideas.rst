@@ -16,4 +16,5 @@ Priority "Would love to have that in"
 Priority "May be"
 -----------------
 - send a nice greeting message to the author whenever this script is run :-)
+- asking for the target, where this newly created distribution shall be pushed to (e.g. to directly publish it on github or the like)
 - asking for the FLOW3 release (tag name) that should be taken to build the distribution instead of HEAD

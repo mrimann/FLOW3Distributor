@@ -239,15 +239,6 @@ Web/_Resources/*
 EOF
 
 
-# TODO Make it ask for and add a custom remote origin url:
-#git remote add <wherever this repo is supposed to go> origin
-# And then at the end of this script, push the resulting distro:
-#git push origin
-
-# TODO make it checkout a particular tag like FLOW3_1.0.4 or something.
-
-
-
 # include the Admin package if it was requested before
 if $pkg_admin; then
 	git submodule add git://github.com/mneuhaus/FLOW3-Admin.git Packages/Application/Admin
