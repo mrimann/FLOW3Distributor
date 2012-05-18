@@ -24,7 +24,8 @@
 # ask for the name of the distribution to create (target folder name)
 echo
 echo
-echo "What should your distribution be named (this will be the name of the directory containing the new Distribution):"
+echo "What should your distribution be named (this will be the name of the directory"
+echo "containing the new Distribution):"
 read targetName
 
 if [ -z ${targetName} ]; then
