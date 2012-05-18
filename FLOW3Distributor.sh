@@ -165,48 +165,56 @@ echo
 
 
 # init the new distribution
-git clone --recursive -o typo3 git://git.typo3.org/FLOW3/Distributions/Base.git ${targetName}
 cd ${targetName}
-#git init
+if $doRecursiveClone; then
+	git clone --recursive -o typo3 git://git.typo3.org/FLOW3/Distributions/Base.git ${targetName}
+	git config --unset branch.master.remote
+	cd ${targetName}/
+else
+	git init
+	
+	# hook in all the needed submodules
+	git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.FLOW3.git Packages/Framework/TYPO3.FLOW3
+	git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.Fluid.git Packages/Framework/TYPO3.Fluid
+	git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.Kickstart.git Packages/Framework/TYPO3.Kickstart
+	git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.Party.git Packages/Framework/TYPO3.Party
+	git submodule add git://git.typo3.org/FLOW3/Packages/Doctrine.ORM.git Packages/Framework/Doctrine.ORM
+	git submodule add git://git.typo3.org/FLOW3/Packages/Doctrine.Common.git Packages/Framework/Doctrine.Common
+	git submodule add git://git.typo3.org/FLOW3/Packages/Doctrine.DBAL.git Packages/Framework/Doctrine.DBAL
+	git submodule add git://git.typo3.org/FLOW3/Packages/Symfony.Component.Yaml.git Packages/Framework/Symfony.Component.Yaml
+	git submodule add git://git.typo3.org/FLOW3/BuildEssentials.git Build/Common
 
-git config --unset branch.master.remote
+	# add the needed base files from the FLOW3 base distribution
+	cd ../
+	git clone git://git.typo3.org/FLOW3/Distributions/Base.git FLOW3_BaseDistribution
 
-# Add Base.git as remote
-#git remote add typo3 git://git.typo3.org/FLOW3/Distributions/Base.git
-#git pull typo3 master
+	mv FLOW3_BaseDistribution/Web ${targetName}/
+	mv FLOW3_BaseDistribution/flow3 ${targetName}/
+	mv FLOW3_BaseDistribution/flow3.bat ${targetName}/
+	mv FLOW3_BaseDistribution/Configuration ${targetName}/
+	rm -rf FLOW3_BaseDistribution
 
-# TODO Make it ask for and add a custom remote origin url:
-#git remote add <wherever this repo is supposed to go> origin
-# And then at the end of this script, push the resulting distro:
-#git push origin
+	# let's move on to the new distribution's directory and pimp it a bit
+	cd ${targetName}
+	
+	# create our own Routes.yaml file
+	echo "Now creating a custom Routes.yaml file"
+	cat > Configuration/Routes.yaml <<EOF
+	##
+	# FLOW3 subroutes
+	#
 
-# TODO make it checkout a particular tag like FLOW3_1.0.4 or something.
+	-
+	  name: 'FLOW3'
+	  uriPattern: '<FLOW3Subroutes>'
+	  defaults:
+	    '@format': 'html'
+	  subRoutes:
+	    FLOW3Subroutes:
+	      package: TYPO3.FLOW3
+EOF
 
-# hook in all the needed submodules
-#git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.FLOW3.git Packages/Framework/TYPO3.FLOW3
-#git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.Fluid.git Packages/Framework/TYPO3.Fluid
-#git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.Kickstart.git Packages/Framework/TYPO3.Kickstart
-#git submodule add git://git.typo3.org/FLOW3/Packages/TYPO3.Party.git Packages/Framework/TYPO3.Party
-#git submodule add git://git.typo3.org/FLOW3/Packages/Doctrine.ORM.git Packages/Framework/Doctrine.ORM
-#git submodule add git://git.typo3.org/FLOW3/Packages/Doctrine.Common.git Packages/Framework/Doctrine.Common
-#git submodule add git://git.typo3.org/FLOW3/Packages/Doctrine.DBAL.git Packages/Framework/Doctrine.DBAL
-#git submodule add git://git.typo3.org/FLOW3/Packages/Symfony.Component.Yaml.git Packages/Framework/Symfony.Component.Yaml
-#git submodule add git://git.typo3.org/FLOW3/BuildEssentials.git Build/Common
-
-
-# add the needed base files from the FLOW3 base distribution
-#cd ../
-#git clone git://git.typo3.org/FLOW3/Distributions/Base.git FLOW3_BaseDistribution
-
-#mv FLOW3_BaseDistribution/Web ${targetName}/
-#mv FLOW3_BaseDistribution/flow3 ${targetName}/
-#mv FLOW3_BaseDistribution/flow3.bat ${targetName}/
-#mv FLOW3_BaseDistribution/Configuration ${targetName}/
-#rm -rf FLOW3_BaseDistribution
-
-
-# let's move on to the new distribution's directory and pimp it a bit
-#cd ${targetName}
+fi
 
 # ignore certain files from being versioned by Git
 touch .gitignore
@@ -222,30 +230,25 @@ Web/_Resources/*
 EOF
 
 
-# create our own Routes.yaml file
-echo "Now creating a custom Routes.yaml file"
-cat > Configuration/Routes.yaml << EOF
-##
-# FLOW3 subroutes
-#
+# Add Base.git as remote
+#git remote add typo3 git://git.typo3.org/FLOW3/Distributions/Base.git
+#git pull typo3 master
 
--
-  name: 'FLOW3'
-  uriPattern: '<FLOW3Subroutes>'
-  defaults:
-    '@format': 'html'
-  subRoutes:
-    FLOW3Subroutes:
-      package: TYPO3.FLOW3
-EOF
+# TODO Make it ask for and add a custom remote origin url:
+#git remote add <wherever this repo is supposed to go> origin
+# And then at the end of this script, push the resulting distro:
+#git push origin
 
-# ask whether the Admin package should be integrated
+# TODO make it checkout a particular tag like FLOW3_1.0.4 or something.
 
+
+
+# include the Admin package if it was requested before
 if $pkg_admin; then
 	git submodule add git://github.com/mneuhaus/FLOW3-Admin.git Packages/Application/Admin
 	./flow3 package:activate Admin
 	mv Configuration/Routes.yaml Configuration/Routes_orig.yaml
-	cat > Configuration/Routes.yaml << EOF
+	cat > Configuration/Routes.yaml <<EOF
 ##
 # Admin package subroutes
 #
