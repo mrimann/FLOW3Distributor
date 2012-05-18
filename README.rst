@@ -22,6 +22,23 @@ This will create the following directory structure::
 
 During the run of the script, the basically needed submodules like FLOW3 itself are being added as Git submodules automagically. Your're getting asked about adding further FLOW3-Packages either directly from git.typo3.org - or from any other Git repository.
 
+How to stay up to date?
+.......................
+The script now knows two different operation modes how to create your new distribution:
+
+Create a virgin distribution
+	This will create a distribution containing all the required packages as Git submodules and the history of the generated repository starts with an initial commit.
+	In case the Core Developers of FLOW3 publish changes to the FLOW3 Base-Distribution hosted on git.typo3.org, these changes are **not** directly fetchable into the new repository.
+
+Create a linked clone distribution
+	This will create a repository that has the FLOW3 Base-Distribution's repository at git.typo3.org as a separate remote called "typo3". The history of the newly created Distribution repository will contain all the commits that have been in the repository at the time of cloning.
+	The profit of doing so is, that you will later on be easily able to fetch and merge changes from the Core Developers of FLOW3 into your own Distribution repository and keep track of all the changes that they made - and you're even able to do your own changes on top of their changes and keep track of them, too. Yes, thanks to Git this is possible :-)
+
+The script asks you which way you want to go - just answer accordingly.
+
+
+Publishing your new distribution is easy!
+.........................................
 Just move your Distribution directory to wherever you need. It's a full blown Git repository that already contains the first commit and all the needed submodules.
 
 
