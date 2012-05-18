@@ -230,10 +230,6 @@ Web/_Resources/*
 EOF
 
 
-# Add Base.git as remote
-#git remote add typo3 git://git.typo3.org/FLOW3/Distributions/Base.git
-#git pull typo3 master
-
 # TODO Make it ask for and add a custom remote origin url:
 #git remote add <wherever this repo is supposed to go> origin
 # And then at the end of this script, push the resulting distro:
