@@ -67,7 +67,6 @@ while true; do
 	esac
 done
 echo
-echo
 
 
 # Check if the directory for (temporarily) cloning the FLOW3 Base Distribution exists already
@@ -105,7 +104,6 @@ while true; do
 				break;;
 		[Nn]* ) echo "OK, no Admin Package for you."
 				pkg_admin=false
-				echo
 				break;;
 		* ) echo "Please answer yes or no.";;
 	esac
@@ -137,7 +135,9 @@ while true; do
 				pkg_url_push "git://git.typo3.org/FLOW3/Packages/${packageName}"
 				;;
 				# No break, so that we can ask for multiple packages
-		[Nn]* ) echo "OK, no more TYPO3 packages. Perhaps there are packages in a different git repository that you want to include...?"
+		[Nn]* ) echo "OK, no more TYPO3 packages."
+				echo
+				echo "Perhaps there are packages in a different git repository that you want to include...?"
 				echo
 				break;;
 		* ) echo "Please answer yes or no.";;
