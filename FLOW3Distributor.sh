@@ -192,6 +192,7 @@ else
 	git submodule add git://git.typo3.org/FLOW3/Packages/Doctrine.Common.git Packages/Framework/Doctrine.Common
 	git submodule add git://git.typo3.org/FLOW3/Packages/Doctrine.DBAL.git Packages/Framework/Doctrine.DBAL
 	git submodule add git://git.typo3.org/FLOW3/Packages/Symfony.Component.Yaml.git Packages/Framework/Symfony.Component.Yaml
+	git submodule add git://git.typo3.org/FLOW3/Packages/Symfony.Component.DomCrawler.git Packages/Framework/Symfony.Component.DomCrawler
 	git submodule add git://git.typo3.org/FLOW3/BuildEssentials.git Build/Common
 
 	# add the needed base files from the FLOW3 base distribution
