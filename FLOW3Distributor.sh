@@ -175,12 +175,12 @@ echo
 
 
 # init the new distribution
-cd ${targetName}
 if $doRecursiveClone; then
 	git clone --recursive -o typo3 git://git.typo3.org/FLOW3/Distributions/Base.git ${targetName}
 	git config --unset branch.master.remote
 	cd ${targetName}/
 else
+	cd ${targetName}
 	git init
 	
 	# hook in all the needed submodules
