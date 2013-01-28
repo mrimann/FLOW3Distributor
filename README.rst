@@ -1,5 +1,13 @@
 What's this all about?
 ----------------------
+
+	Please note: With the switch to Composer that was done while working on TYPO3 Flow v2.0, I guess this
+	Script is not needed anymore at all - just use Composer to kickstrap your distribution and require
+	the stuff needed in your distribution.
+
+	But of course, you can continue to use this script in case you want to easily keep track of the
+	changes to the Base-Distribution offered on git.typo3.org
+
 The goal of this small bash script is to simplify the process of creating a new base distribution for a new project. If you're "just" creating a package for FLOW3 that will be part of an existing FLOW3 installation, you probably won't need this. It is intented for situations where you want to start a project that can be shipped out of the box by delivering a full blown distribution that contains all the needed components like the FLOW3 Framework, Fluid templating engine and some basic config files.
 
 **Attention:** Of course you need to "add life" to this new empty distribution by adding your package(s) and changing the config files to your need. It's more like a kickstarter, not a wonder-machine.
